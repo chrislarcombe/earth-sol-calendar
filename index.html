@@ -1,0 +1,433 @@
+
+
+<style type="text/css">
+@font-face {
+    font-family: 'teko_regularregular';
+    src: url('font/teko-regular-webfont.eot');
+    src: url('font/teko-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('font/teko-regular-webfont.woff2') format('woff2'),
+         url('font/teko-regular-webfont.woff') format('woff'),
+         url('font/teko-regular-webfont.ttf') format('truetype'),
+         url('font/teko-regular-webfont.svg#teko_regularregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+  text-align: center;
+  font-family: teko_regularregular, Impact, Charcoal, sans-serif	;
+  background-color: black;
+  color: white;
+ }
+
+.circle {
+	border-radius: 50%;
+	width: 100px;
+	height: 100px; 
+	float:left;
+	text-align: center;
+	color: white;
+	font-size: 18pt;
+	line-height: 145%;
+}
+
+.play
+{
+	border: 2px green;
+
+}
+
+.content
+{
+  width: 660px;
+  margin: 0 auto;
+
+}
+
+html,
+body {
+    width: 100%;
+    height: 93%;
+}
+html {
+    display: table;
+}
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+</style>
+<body>
+
+	<div id="inputdt" style="position: absolute; left: 20px; top: 20px;">
+		<label for="inputdatetime">Date to convert: &nbsp; </label><input id="inputdatetime" type="datetime-local" onchange="convertDateTime()" onkeypress="keyEvent(event)"/> <input onclick='convertDateTime()' id='go' type='button' value='Convert'/> <input onclick='convertDateTime(1)' id='l
+		ive' type='button' value='Now'/>
+	</div>
+
+	<div class="content">
+		<div id='now' style='font-size: 50pt; padding:20px'></div>
+		<table cellspacing="0" >
+		       <tr>
+		          <td id="w1">
+		          </td>
+		       </tr>
+		       <tr>
+		          <td id="w2">
+		          </td>
+		       </tr>
+		       <tr>
+		          <td id="w3">
+		          </td>
+		       </tr>
+		       <tr>
+		          <td id="w4">
+		          </td>
+		       </tr>
+		       <tr>
+		          <td id="w5">
+		          </td>
+		       </tr>
+		</table>
+	</div>
+</body>
+<script>
+
+keyEvent = function(e)
+{
+	if (e.keyCode == 13)
+    	convertDateTime();
+}
+
+convertDateTime = function(live)
+{
+	if (live)
+	{
+		resetInputDateTime();
+		updateCalendar();
+	}
+	else
+	{
+		updateCalendar( new Date(document.getElementById("inputdatetime").value) );
+	}
+}
+
+resetInputDateTime = function()
+{
+
+	var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+	var localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+	document.getElementById("inputdatetime").value = localISOTime;
+
+}
+
+resetInputDateTime();
+
+
+
+Date.prototype.getESC = function()
+{
+	var isLeapYear = function(d)
+	{
+	    var year = d.getFullYear();
+	    if((year & 3) != 0) return false;
+	    return ((year % 100) != 0 || (year % 400) == 0);
+	};
+	var getDayOfYear = function(d)
+	{
+	    var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+	    var mn = d.getMonth();
+	    var dn = d.getDate();
+	    var dayOfYear = dayCount[mn] + dn;
+	    if(mn > 1 && isLeapYear(d)) dayOfYear++;
+	    return dayOfYear;
+	};
+
+
+	var doy = getDayOfYear(this);
+
+	var escDOY;
+	var leapDiff = (isLeapYear(this) ? 1 : 0);
+	if (doy >= 356 + leapDiff) // Dec 22 = 356 (non-leap) or 357 (leap)
+		escDOY = doy - (365-10) - leapDiff;
+	else
+		escDOY = doy + 10;
+
+	var day, week, date, month, intercal;
+
+	if (escDOY <= 180)
+	{
+		month = Math.ceil(escDOY / 30);
+		date = escDOY - 30*(month-1) ;
+	}
+	else if (escDOY >= 181 && escDOY <= 182 + leapDiff)
+	{
+		intercal = escDOY == 183 ? 'L' : escDOY - 180;
+	}
+	else if (escDOY >= 363 + leapDiff)
+	{
+		intercal = escDOY - 362 - leapDiff + 2;
+	}
+	else
+	{
+		month = Math.ceil((escDOY-2-leapDiff) / 30);
+		date = (escDOY-2-leapDiff) - 30*(month-1) ;
+	}
+	if (!intercal)
+	{
+		week = Math.ceil(date / 6);
+		day = date - (week-1)*6;
+	}
+
+	return {day: day, week: week, month: month, date: date, year: this.getFullYear() - 2012 + (escDOY <= 10 ? 1 : 0) , intercal: intercal};
+};
+
+
+Date.prototype.getESCDay = function()
+{
+	return this.getESC().day;
+};
+
+Date.prototype.getESCWeek = function()
+{
+	return this.getESC().week;
+};
+
+Date.prototype.getESCMonth = function()
+{
+	return this.getESC().month;
+};
+
+Date.prototype.getESCDate = function()
+{
+	return this.getESC().date;
+};
+
+Date.prototype.getESCDateString = function()
+{
+	var d = this.getESC();
+
+	if (d.month)
+		return (d.date<10?"0":"") + d.date + "-" + (d.month<10?"0":"") +  d.month + "-" + d.year;
+	else
+		return "@" + d.intercal + "-" + d.year;
+};
+
+Date.prototype.getESCDateStringShort = function()
+{
+	var d = this.getESC();
+
+	if (d.month)
+		return d.month + "/" + d.year;
+	else
+		return "@" + d.intercal + "-" + d.year;
+};
+
+Date.prototype.getESCDayString = function()
+{
+	var d = this.getESC();
+	if (d.day && d.week)
+		return d.day + "-"+ d.week
+	else
+		return 'X-X'
+};
+
+Date.prototype.getESCString = function()
+{
+	return this.getESCDayString() + " " + this.getESCDateString() + " " + this.toTimeString();
+};
+
+
+
+updateCalendar = function(x)
+{
+	if (!x) x = new Date();
+
+	var esc = x.getESC();
+
+	if (esc.month)
+	{
+
+		var gregDate = [];
+		var y = new Date( x.getTime() - 1000*60*60*24*(esc.date-1) )
+		for (var i = 0; i < 30; i++)
+		{
+			gregDate[i] = y.getDate();
+			y.setDate(y.getDate() + 1);
+		}
+
+
+		var count = 0;
+
+		document.getElementById('now').innerHTML = "Day " + x.getESC().day + " / Strong "+ x.getESC().week +" &nbsp; <small><small><small><font color='#555'>MONTH "+x.getESC().month+" / YEAR "+x.getESC().year+"</font></small></small></small>"
+
+		for (var W = 1; W <= 5; W++)
+		{
+			document.getElementById('w'+W).innerHTML = "";
+
+			for (var D = 1; D <= 6; D++)
+			{
+				var div = document.createElement('div');
+
+				document.getElementById('w'+W).appendChild(div);
+
+				div.className = 'circle';
+
+
+				switch (D)
+				{
+					case 1:
+						div.style['border'] = "solid 2px rgb(255,0,0)"
+						break;
+					case 2:
+						div.style['border'] = "solid 2px rgb(255,127,0)"
+						break;
+					case 3:
+						div.style['border'] = "solid 2px rgb(255,255,0)"
+						break;
+					case 4:
+						div.style['border'] = "solid 2px rgb(0,255,0)"
+						break;
+					case 5:
+						div.style['border'] = "solid 2px rgb(0,0,255)"
+						break;
+					case 6:
+						div.style['border'] = "solid 2px rgb(160,32,240)"
+						break;
+				}
+
+
+
+				if (D == 3 || D == 6)
+				{
+					//div.style['background-color'] = "rgba(0,0,255,0.5)"
+					//div.style['border'] = "solid 3px #0000aa"
+				}
+				else
+				{
+				//	div.style['background-color'] = "rgba(0,255,0,0.2)"
+
+					//div.style['background-color'] = "#eeeeee"
+					//div.style['border'] = "solid 4px green"
+				}
+
+
+
+
+				if (W > esc.week || (W == esc.week && D > esc.day))
+					div.style['opacity'] = "0.4"
+
+				if (D == esc.day && W == esc.week)
+				{
+					div.style['border-width'] = "4px";
+
+					switch (D)
+					{
+						case 1:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(255,0,0)"
+							break;
+						case 2:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(255,127,0)"
+							break;
+						case 3:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(255,255,0)"
+							break;
+						case 4:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(0,255,0)"
+							break;
+						case 5:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(0,0,255)"
+							break;
+						case 6:
+							div.style['-webkit-box-shadow'] = "0 0 30px rgb(160,32,240)"
+							break;
+					}
+				}
+
+				/*if (D == esc.day && W == esc.week)
+					if (D == 3 || D == 6)
+						div.style['border'] = "solid 5px #00FFFF"
+					else
+						div.style['border'] = "solid 5px #00FF00"
+						*/
+
+				div.innerHTML = "<font color='#CC0000'>" + gregDate[count] + "</font><br><big><big>" + D + "<font color='#999'>/" + W + "</font></big></big><br><font color='#aaa'>" + ((W-1)*6 + D) + "</font>";
+
+				count++;
+			};
+		};
+	}
+	else
+	{
+document.getElementById('now').innerHTML = "Day " + esc.intercal +" &nbsp; <small><small><small><font color='#555'>INTERCALARY</font></small></small></small>"
+
+
+		
+		for (var W = 1; W <= 5; W++)
+		{
+			document.getElementById('w'+W).innerHTML = "";
+		}
+
+		var period = [[1,2,'L'], [1,2], [3,4,5]];
+
+		console.log(esc.intercal)
+
+
+		var isLeapYear = function(year)
+		{
+		    if((year & 3) != 0) return false;
+		    return ((year % 100) != 0 || (year % 400) == 0);
+		};
+
+
+		var p;
+
+		if (period[0].indexOf(esc.intercal) != -1)
+		{
+			if (isLeapYear(esc.year))
+				p = 0;
+			else
+				p = 1;
+		}
+		else
+		{
+			p = 2;
+		}
+
+		for (var i = 0; i < period[p].length; i++)
+		{
+			var D = period[p][i]
+
+			var div = document.createElement('div');
+
+			document.getElementById('w1').appendChild(div);
+
+			div.className = 'circle';
+
+			div.style['background-color'] = "black"
+			div.style['border'] = "solid 5px blue"
+
+			div.innerHTML = "<br><big><big><b>@" + D + "</b></big></big>";
+
+
+			if (period[p].indexOf(D) > period[p].indexOf(esc.intercal))
+				div.style['opacity'] = "0.33"
+
+
+
+		}
+
+
+	}
+}
+
+updateCalendar();
+
+document.title = "Earth-Sol Calendar (now)"
+
+
+</script>
+
+
+
