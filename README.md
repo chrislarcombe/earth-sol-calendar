@@ -1,5 +1,7 @@
 # Earth-Sol Calendar (ESC)
-Calendar based on the natural cycles of the Earth and Sun.
+Regular calendar based on the natural cycles of the Earth and Sun.
+
+See a [live demo](https://larcombe.io/esc) of the calendar.
 
 ## Description
 
