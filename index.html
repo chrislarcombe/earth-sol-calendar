@@ -258,9 +258,6 @@ updateCalendar = function(x)
 		if (x.getMonth() == 5 && !isLeapYear(x.getFullYear()))
 			p = 1;
 
-		
-			console.log(esc, p, period, esc.transcal, x.getFullYear(), isLeap);
-
 		for (var D = 1; D <=2; D++)
 		{
 			var div = document.createElement('div');
@@ -280,8 +277,6 @@ updateCalendar = function(x)
 	}
 	else if (esc.day == 'L')
 	{
-		console.log(esc);
-
 		document.getElementById('now').innerHTML = "Leap Day &nbsp;<small><small><small><font color='#555'>Year "+esc.year+"</font></small></small></small>"
 		
 		for (var W = 1; W <= 5; W++)
@@ -299,9 +294,6 @@ updateCalendar = function(x)
 	}
 	else if (esc.day == 'N')
 	{
-
-		console.log(esc);
-
 		document.getElementById('now').innerHTML = "New Year's Day &nbsp;<small><small><small><font color='#555'>Year "+esc.year+"</font></small></small></small>"
 
 		for (var W = 1; W <= 5; W++)
