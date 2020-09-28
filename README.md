@@ -32,7 +32,7 @@ The strongs can also be numbered or named: one suggestion is to use the natural 
         * 5 strongs per month
             * 6 days per strong
 
-*(relative to Northern Hemisphere, which is home to approximately 70% of humanity. This is obviously reversed in the Southern Hemisphere.)
+*(relative to Northern Hemisphere, which is home to approximately 70% of humanity)
 
 ## Licence
 
