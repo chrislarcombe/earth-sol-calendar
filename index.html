@@ -1,26 +1,18 @@
 <!--
 
-Earth-Sol Calendar - Calendar based on the natural cycles of the Earth and Sun.
-Copyright (C) 2020 Chris Larcombe
+Earth-Sol Calendar Demo - Interactive ESC Calendar
+Written in 2020 by Chris Larcombe <chris@larcombe.io>
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+[see /lib/esc.js for ESC code, which is also licenced with CC0]
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
+You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 -->
 
 <head>
 	<title>Earth-Sol Calendar</title>
-	<script src="/lib/ESC-1.0.js"></script>
+	<script src="/lib/esc.js"></script>
 	<style type="text/css">
 		@font-face {
 			font-family: 'teko_regularregular';
@@ -57,18 +49,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 			height: 100px; 
 			float:left;
 			text-align: center;
-			color: white;
-			font-size: 18pt;
-			line-height: 145%;
+			color: rgb(150,150,150);
+			font-size: 15pt;
 		}
 
-		.play {
+		.circleTitle
+		{
+			color: white;
+			padding-top: 5px;
+			font-size: 30pt;
+		}
+		.play
+		{
 			border: 2px green;
 		}
 
-		.content {
-		width: 660px;
-		margin: 0 auto;
+		.content
+		{
+			padding-top: 70px;
+			width: 660px;
+			margin: 0 auto;
+		}
+
+		.today
+		{
+			font-size: 20pt;
+			padding:20px;
+			opacity: 0.5;
 		}
 	</style>
 </head>
@@ -102,6 +109,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 		          </td>
 		       </tr>
 		</table>
+		<div id="today" class="today"></div>
 	</div>
 </body>
 
@@ -140,7 +148,8 @@ resetInputDateTime();
 updateCalendar = function(x)
 {
 	if (!x) x = new Date();
-	var esc = x.getESC();
+	
+	var esc = x.esc();
 
 	if (esc.month)
 	{
@@ -154,7 +163,7 @@ updateCalendar = function(x)
 
 		var count = 0;
 
-		document.getElementById('now').innerHTML = "Day " + x.getESC().day + " / Strong "+ x.getESC().week +" &nbsp; <small><small><small><font color='#555'>MONTH "+x.getESC().month+" / YEAR "+x.getESC().year+"</font></small></small></small>"
+		document.getElementById('now').innerHTML = "Day " + x.esc().day + " / Strong "+ x.esc().strong +" &nbsp; <small><small><small><font color='#555'>MONTH "+x.esc().month+" / YEAR "+x.esc().year+"</font></small></small></small>"
 
 		for (var W = 1; W <= 5; W++)
 		{
@@ -188,10 +197,10 @@ updateCalendar = function(x)
 						break;
 				}
 
-				if (W > esc.week || (W == esc.week && D > esc.day))
+				if (W > esc.strong || (W == esc.strong && D > esc.day))
 					div.style['opacity'] = "0.4"
 
-				if (D == esc.day && W == esc.week)
+				if (D == esc.day && W == esc.strong)
 				{
 					div.style['border-width'] = "4px";
 
@@ -217,47 +226,44 @@ updateCalendar = function(x)
 							break;
 					}
 				}
-
-				div.innerHTML = "<font color='#CC0000'>" + gregDate[count] + "</font><br><big><big>" + D + "<font color='#999'>/" + W + "</font></big></big><br><font color='#aaa'>" + ((W-1)*6 + D) + "</font>";
+				var DM = ((W-1)*6 + D);
+				div.innerHTML = "<br>" +  D + " / " + W + " / " + DM  + "<div class='circleTitle'>" + DM + "</div>";
 				count++;
 			};
 		};
+
+		var colours = {1:"Red",2:"Orange",3:"Yellow",4:"Green",5:"Blue",6:"Purple"};
+		var strongs = {1:"Earth",2:"Water",3:"Fire",4:"Air",5:"Spirit"};
+		document.getElementById('today').innerHTML = '"' + colours[esc.day]+ " "+strongs[esc.strong] + '"';
 	}
-	else
+	else if (esc.transcal)
 	{
-		document.getElementById('now').innerHTML = "Day " + esc.intercal +" &nbsp; <small><small><small><font color='#555'>INTERCALARY</font></small></small></small>"
+		document.getElementById('now').innerHTML = "Day " + esc.transcal +" &nbsp; <small><small><small><font color='#555'>TRANSCALARY</font></small></small></small>"
 		
 		for (var W = 1; W <= 5; W++)
 			document.getElementById('w'+W).innerHTML = "";
 
-		var period = [[1,2,'L'], [1,2], [3,4,5]];
+		var period = [[1,2,3], [1,2]];
+
 
 		var isLeapYear = function(year)
 		{
-		    if((year & 3) != 0) return false;
-		    return ((year % 100) != 0 || (year % 400) == 0);
+			if((year & 3) != 0) return false;
+			return ((year % 100) != 0 || (year % 400) == 0);
 		};
+		var isLeap = isLeapYear(x.getFullYear());
 
-		var p;
+		var p = 0;
 
-		if (period[0].indexOf(esc.intercal) != -1)
+		if (x.getMonth() == 5 && !isLeapYear(x.getFullYear()))
+			p = 1;
+
+		
+			console.log(esc, p, period, esc.transcal, x.getFullYear(), isLeap);
+
+		for (var D = 1; D <=2; D++)
 		{
-			if (isLeapYear(esc.year))
-				p = 0;
-			else
-				p = 1;
-		}
-		else
-		{
-			p = 2;
-		}
-
-		for (var i = 0; i < period[p].length; i++)
-		{
-			var D = period[p][i]
-
 			var div = document.createElement('div');
-
 			document.getElementById('w1').appendChild(div);
 
 			div.className = 'circle';
@@ -265,9 +271,51 @@ updateCalendar = function(x)
 			div.style['border'] = "solid 5px blue"
 			div.innerHTML = "<br><big><big><b>@" + D + "</b></big></big>";
 
-			if (period[p].indexOf(D) > period[p].indexOf(esc.intercal))
+			if (D > esc.transcal)
 				div.style['opacity'] = "0.33"
 		}
+
+		var ic = {1:'"One"', 2:'"Two"'};
+		document.getElementById('today').innerHTML = ic[esc.transcal];
+	}
+	else if (esc.day == 'L')
+	{
+		console.log(esc);
+
+		document.getElementById('now').innerHTML = "Leap Day &nbsp;<small><small><small><font color='#555'>Year "+esc.year+"</font></small></small></small>"
+		
+		for (var W = 1; W <= 5; W++)
+			document.getElementById('w'+W).innerHTML = "";
+
+		var div = document.createElement('div');
+		document.getElementById('w1').appendChild(div);
+
+		div.className = 'circle';
+		div.style['background-color'] = "black"
+		div.style['border'] = "solid 5px rgb(100,100,255)"
+		div.innerHTML = "<br><big><big><b>@L</b></big></big>";
+
+		document.getElementById('today').innerHTML = '"Leap"';
+	}
+	else if (esc.day == 'N')
+	{
+
+		console.log(esc);
+
+		document.getElementById('now').innerHTML = "New Year's Day &nbsp;<small><small><small><font color='#555'>Year "+esc.year+"</font></small></small></small>"
+
+		for (var W = 1; W <= 5; W++)
+			document.getElementById('w'+W).innerHTML = "";
+
+		var div = document.createElement('div');
+		document.getElementById('w1').appendChild(div);
+
+		div.className = 'circle';
+		div.style['background-color'] = "black"
+		div.style['border'] = "solid 5px rgb(100,100,255)"
+		div.innerHTML = "<br><big><big><b>@N</b></big></big>";
+
+		document.getElementById('today').innerHTML = '"New Year\'s"';
 	}
 }
 
