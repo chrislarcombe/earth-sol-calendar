@@ -17,7 +17,7 @@ In the ESC there are also 6 'intercalary' days, which fall outside of the regula
 
 The year count (New Year's Day, year 1) begins on what was known as '21st December 2012' (Winter Solstice '2012' in the Northern Hemisphere) in the Gregorian Calendar. At the time of writing it is currently year 8. New Year's day was chosen to be around the same time of the year as in the Gregorian calendar for global cultural continuity, though now adjusted to align with the cycle of the natural (actual) year.
 
-The strongs can also be numbered or named: one suggestion is to use the natural elements in the following order: Earth, Water, Fire, Air, Spirit. The existence of the 5th element is evident and known to growing portion of the global human population. The names of the elements can also be easily translated into all languages, since the 5 elements are present and known in most if not all human cultures on Earth.
+The strongs can also be numbered or named: one suggestion is to use the natural elements in the following order: Earth, Water, Fire, Air, Ether. The existence of the 5th element is evident and known to a growing portion of the global human population. The names of the elements can also be easily translated into all languages, since the 5 elements are present and known in most if not all human cultures on Earth.
 
 ### Calendar Structure:
 
