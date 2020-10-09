@@ -12,7 +12,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 
 <head>
 	<title>Earth-Sol Calendar</title>
-	<script src="lib/esc.js"></script>
+	<script src="lib/esc.min.js"></script>
 	<style type="text/css">
 		@font-face {
 			font-family: 'teko_regularregular';
@@ -85,12 +85,22 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 			outline: none;
     		font-family: teko_regularregular;
 		}
+
+		#thetime
+		{
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			font-size: 20pt;
+		}
 	</style>
 </head>
 <body>
 	<div id="inputdt" style="position: absolute; left: 20px; top: 20px;">
 		<label for="inputdatetime">Date to convert: &nbsp; </label><input id="inputdatetime" type="date" onchange="convertDateTime()" onkeypress="keyEvent(event)"/> &nbsp; <input onclick='convertDateTime(1)' id='live' type='button' value='Now'/>
 	</div>
+
+	<div id="thetime"></div>
 
 	<div class="content">
 		<div id='now' style='font-size: 50pt; padding:20px'></div>
@@ -170,7 +180,7 @@ updateCalendar = function(x)
 
 		var count = 0;
 
-		document.getElementById('now').innerHTML = "Day " + x.esc().day + " / Strong "+ x.esc().strong +" &nbsp; <small><small><small><font color='#555'>MONTH "+x.esc().month+" / YEAR "+x.esc().year+"</font></small></small></small>"
+		document.getElementById('now').innerHTML = "Day " + x.esc().day + " / Strong "+ x.esc().strong +" &nbsp; <small><small><small><font color='#aaa'>MONTH "+x.esc().month+" / YEAR "+x.esc().year+"</font></small></small></small>"
 
 		for (var W = 1; W <= 5; W++)
 		{
@@ -319,5 +329,11 @@ updateCalendar = function(x)
 }
 
 updateCalendar();
+
+setInterval(function()
+{
+	var escNow = new Date().esc();
+	document.getElementById('thetime').innerHTML = "<font color='#888888'>Current time:</font>&nbsp; " + escNow.time.join(':');
+}, 1000);
 
 </script>
